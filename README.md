@@ -1,6 +1,6 @@
 # Todo-App(This is Backend of todo application in nodejs)
 
-Todo app is an intuitive and you can see easy your task and Create todo and manage them.
+Todo app is an intuitive and you can see easy your task and Create todo.
 
 
                         run command npm install to get all the packages
