@@ -18,11 +18,7 @@ Todo app is an intuitive and you can see easy your task and Create todo.
 
 Usages:-
 
-NPM
-Nodejs
-Knexjs
-Expressjs
-bcryptjs
+NPM Nodejs Knexjs Expressjs bcryptjs
 
 
 Contributing:-
