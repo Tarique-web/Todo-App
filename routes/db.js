@@ -20,7 +20,6 @@ knex.schema.hasTable('users').then(function (exists) {
             table.text('email', 50);
             table.text('password', 50);
             table.integer("Age", 5);
-            // table.integer("cityId");
             table.integer("cityId").unsigned().references('id').inTable('city');
 
         });
@@ -30,7 +29,7 @@ knex.schema.hasTable('users').then(function (exists) {
 }).catch((err)=>{
     console.log(err);
 })
-// this table for blog
+
 knex.schema.hasTable("city").then(function (exists) {
     if (!exists) {
         return knex.schema.createTable("city", function (table) {
