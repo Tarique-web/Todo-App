@@ -1,36 +1,21 @@
 const express = require('express');
 const body = require("body-parser");
-const knex  = require('./routes/db');
-const jwt = require("jsonwebtoken");
+const knex = require("./config/db")
 const bcrypt = require("bcryptjs")
-// var cookieParser = require('cookie-parser');
-
-
-
+const dotenv = require("dotenv").config();
 const router = express.Router();
 
 const app = express();
 app.use(body.json())
-// app.use(cookieParser()); 
+app.use ( body.urlencoded ({ extended : true }));
 
-// app.use ( body.urlencoded ({ extended : true }));
+app.use("/", router);
+// base URLs
+app.use("/signup", require("./router/signupRout"));
+app.use("/login",require("./router/loginRout"));
+app.use('/city',require("./router/cityRout"));
+app.use("/todo",require("./router/todoRout"));
 
-
-
-app.use("/",router);
-require('./routes/login')(router,knex,bcrypt)
-
-app.use("/",router);
-require('./routes/signup')(router,knex,bcrypt)
-
-app.use("/",router);
-require('./routes/city')(router,knex)
-
-app.use("/",router);
-require("./routes/todo")(router,knex)
-
-app.use("/",router);
-require("./routes/users_get")(router,knex)
 
 var port = 4444;
 app.listen(port, () => {
