@@ -17,7 +17,8 @@ app.use('/city',require("./router/cityRout"));
 app.use("/todo",require("./router/todoRout"));
 
 
-var port = 4444;
+var port = process.env.PORT || 2020;
+
 app.listen(port, () => {
     console.log(`Server is working ${port} on port`);
 })

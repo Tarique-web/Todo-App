@@ -27,7 +27,6 @@ exports.prettyfyTodo =async(userDetail)=>{
 exports.prettyfyUserDetails=async(userDetail)=>{
     let userArr=[]
     userDetail.forEach(element => {
-        console.log("element",element);
         let properUserDetail = {
             id:element.id,
             name:element.name,
@@ -50,7 +49,7 @@ exports.prettyfyUserDetails=async(userDetail)=>{
 
 exports.assignedToQyery = async(assignedTo)=>{
     if(assignedTo!==undefined){
-        b=assignedTo.split `,`.map(x=>+x)
+        b=assignedTo.split `,`.map(x=>x)
         if(b.includes(NaN)){
             return false
         }else{return b}

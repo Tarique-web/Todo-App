@@ -38,10 +38,9 @@ exports.createTodo = (req, res) => {
 
 
     const today = moment().format("YYYY-MM-DD")
-    console.log(today);
-    const date = req.body.dueDate
+    const dueDate = req.body.dueDate
 
-    if (date !== moment(date).format("YYYY-MM-DD") || (date < today)) {
+    if (dueDate !== moment(dueDate).format("YYYY-MM-DD") || (dueDate < today)) {
         res.status(400).send({
             message: "Please set dueDate in this formate  `YYYY-MM-DD` and date shouldn't be previous",
             status: 400
@@ -116,12 +115,20 @@ exports.mytodos = (req, res) => {
         .join("users", "users.id", "=", "todos.assignedTo")
         .join("city", "city.id", "=", "users.cityId")
         .where("users.id", cookie).then(async (data) => {
-            console.log(data);
-            let mytodos = await prettyfyTodo(data)
-            res.status(200).send({
-                message: mytodos,
-                status: 200
-            })
+            if (data.length) {
+                let mytodos = await prettyfyTodo(data)
+                res.status(200).send({
+                    message: mytodos,
+                    status: 200
+                })
+            } else {
+                res.status(200).send({
+                    message: "todos is empty",
+                    status: 200
+                })
+            }
+
+
         }).catch((err) => {
 
             console.log(err);
@@ -134,12 +141,18 @@ exports.mytodos = (req, res) => {
 
 }
 
-//geting the todos data to filter
+//Get All Users Todo with Using Filers
+
 
 exports.getTodo = async (req, res) => {
+    console.log(req.query.assignedTo);
+    if (!req.query.assignedTo || !req.query.assignedTo == undefined) {
+        return res.status(400).send({
+            message: "assignedTo can not be empty"
+        })
+    }
 
- 
-    var cookie = req.headers.cookie.slice(5);
+
     let assignedTo = await assignedToQyery(req.query.assignedTo)
     let cityId = req.query.cityId
 
@@ -147,58 +160,50 @@ exports.getTodo = async (req, res) => {
 
         let dates = await dueDate(req.query);
         if (dates) {
-            knex("users")
-                .join("todo", 'users.id', "=", "todo.assignedTo")
-                .join("city", "users.cityId", "=", "city.id")
-                .where(function () {
+            knex.select("*").from("todos")
+                .join("users", "users.Id", "=", "todos.assignedTo")
+                .join("city", "city.id", "=", "users.cityId")
+                .limit(parseInt(req.query.limit))
+                .offset(parseInt(req.query.skip))
+                .where(() => {
                     if (assignedTo !== true) {
                         this.whereIn("assignedTo", assignedTo)
                     } else {
                         this.orWhereNotNull('assignedTo')
                     }
-                }).andWhere(function () {
+                }).andWhere(() => {
                     if (dates != true) {
                         this.whereBetween("dueDate", [dates, fromDueDate, dates.toDueDate])
                     } else {
                         this.orWhereNotNull("dueDate")
                     }
-                }).andWhere(function () {
+                }).andWhere(() => {
                     if (cityId != undefined) {
                         this.where("cityId", cityId)
                     } else {
                         this.orWhereNotNull("cityId")
                     }
-                }).select(
-                    "todos.text",
-                    "todos.assignedTo",
-                    "todos.dueDate",
-                    "users.id", "todos.text",
-                    "todos.assignedTo",
-                    "todos.dueDate",
-                    "users.name",
-                    "users.email",
-                    "users.Age",
-                    "city.Id",
-                    "city.city").then(async (data) => {
-                        if (data.length) {
+                })
+                .then(async (data) => {
+                    if (data.length) {
 
-                            let todoData = await prettyfyTodo(data);
-                            res.status(200).send({
-                                message: todoData,
-                                status: 200
-                            })
-                        } else {
-                            res.status(400).send({
-                                message: "Data Not Found",
-                                status: 400
-                            })
-                        }
-                    }).catch((err) => {
-                        res.status(500).send({
-                            message: "occured err while filtering data" || err,
-                            status: 500
+                        let todoData = await prettyfyTodo(data);
+                        res.status(200).send({
+                            message: todoData,
+                            status: 200
                         })
+                    } else {
+                        res.status(400).send({
+                            message: "Data Not Found",
+                            status: 400
+                        })
+                    }
+                }).catch((err) => {
+                    res.status(500).send({
+                        message: "occured err0r while filtering data" || err,
+                        status: 500
                     })
+                })
         } else {
             res.status(500).send({
                 message: "dueDate should be 'YYYY-MM-DD'"
